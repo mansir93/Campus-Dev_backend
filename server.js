@@ -32,7 +32,7 @@ const options = {
       title: "Express API with Swagger",
       version: "0.1.0",
       description:
-        "This is a simple CRUD API application made with Express and documented with Swagger",
+        "This is a Social Media API application made with Express and documented with Swagger",
       license: {
         name: "MIT",
         url: "https://spdx.org/licenses/MIT.html",
@@ -56,9 +56,9 @@ const specs = swaggerJsdoc(options);
 app.use(
   "/",
   swaggerUi.serve,
-  swaggerUi.setup(specs, { explorer: true, customCssUrl: CSS_URL })
+  swaggerUi.setup(specs, { customCssUrl: CSS_URL, explorer: true })
 );
 
-app.listen(PORT, (res) => {
+app.listen(PORT, () => {
   console.log(`server running on Port ${PORT}`);
 });
