@@ -54,7 +54,7 @@ const options = {
 
 const specs = swaggerJsdoc(options);
 app.use(
-  "/docs",
+  "/",
   swaggerUi.serve,
   swaggerUi.setup(specs, { explorer: true, customCssUrl: CSS_URL })
 );
