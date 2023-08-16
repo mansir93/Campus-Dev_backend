@@ -9,6 +9,9 @@ const connectDB = require("./config/dbConnection");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/auth");
 
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+
 const PORT = process.env.PORT || 5001;
 connectDB();
 
@@ -50,7 +53,11 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
-app.use("/", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
+app.use(
+  "/",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true, customCssUrl: CSS_URL })
+);
 
 app.listen(PORT, (res) => {
   console.log(`server running on Port ${PORT}`);
