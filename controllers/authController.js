@@ -43,6 +43,10 @@ exports.login = asyncHandler(async (req, res) => {
     throw new Error("All fields are required");
   }
   const user = await User.findOne({ email });
+  if (!user) {
+    res.status(404);
+    throw new Error("user not found");
+  }
   // compare password with hashPassword
   if (user && (await bcrypt.compare(password, user.password))) {
     const token = jwt.sign(
@@ -59,6 +63,6 @@ exports.login = asyncHandler(async (req, res) => {
     res.status(200).json({ token });
   } else {
     res.status(401);
-    throw new Error("Email or Password Incorrect");
+    throw new Error("Incorrect Logins");
   }
 });
