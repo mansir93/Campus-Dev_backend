@@ -10,7 +10,7 @@ const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/auth");
 
 const CSS_URL =
-  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.0.0/swagger-ui.min.css";
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
 
 const PORT = process.env.PORT || 5001;
 connectDB();
@@ -21,9 +21,6 @@ const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
-
-app.use("/api/user/", userRoutes);
-app.use("/api/auth/", authRoutes);
 
 const options = {
   definition: {
@@ -58,6 +55,8 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(specs, { customCssUrl: CSS_URL, explorer: true })
 );
+app.use("/api/user/", userRoutes);
+app.use("/api/auth/", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`server running on Port ${PORT}`);
