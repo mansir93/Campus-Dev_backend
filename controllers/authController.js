@@ -6,8 +6,8 @@ const User = require("../models/userModel");
 
 // register
 exports.register = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
-  if (!username || !email || !password) {
+  const { username, email, password,phonenumber } = req.body;
+  if (!username || !email || !password || !phonenumber) {
     res.status(400);
     throw new Error("All fields are required");
   }
@@ -23,6 +23,7 @@ exports.register = asyncHandler(async (req, res) => {
   const user = await User.create({
     username,
     email,
+    phonenumber,
     password: hashedPassword,
   });
   if (user) {
