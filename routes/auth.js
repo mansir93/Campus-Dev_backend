@@ -3,42 +3,6 @@ const { register, login } = require("../controllers/authController");
 
 const router = require("express").Router();
 
-/** 
- * @swagger
- * 
-* components:
-*   schemas:
-*     User:
-*       type: object
-*       properties:
-*         username:
-*           type: string
-*           minLength: 3
-*           maxLength: 20
-*         email:
-*           type: string
-*           format: email
-*           maxLength: 50
-*         password:
-*           type: string
-*           minLength: 6
-*         profile_pic:
-*           type: string
-*         cover_pic:
-*           type: string
-*         followers:
-*           type: array
-*           items:
-*             type: string
-*         following:
-*           type: array
-*           items:
-*             type: string
-*         isAdmin:
-*           type: boolean
-
- */
-
 /**
  * @swagger
  *  tags:

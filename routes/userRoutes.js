@@ -116,6 +116,7 @@ router.get("/:id", getSingleUser);
 // follow user
 router.put("/:id/follow", followUser);
 
+
 /**
  * @swagger
  * /user/{id}/unfollow:
@@ -135,6 +136,7 @@ router.put("/:id/follow", followUser);
  *       '400':
  *         description: Invalid input or unfollow failed
  */
+
 
 // unfollow user
 router.put("/:id/unfollow", unfollowUser);

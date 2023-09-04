@@ -22,6 +22,9 @@ app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
+app.use("/user/", userRoutes);
+app.use("/auth/", authRoutes);
+
 const options = {
   definition: {
     openapi: "3.1.0",
@@ -46,7 +49,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/*.js"],
+  apis: ["./routes/*.js", "./models/*.js"],
 };
 const uiOpts = {
   customSiteTitle: "Campus dev",
@@ -66,8 +69,6 @@ app.use(
     explorer: true,
   })
 );
-app.use("/user", userRoutes);
-app.use("/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`server running on Port ${PORT}`);
