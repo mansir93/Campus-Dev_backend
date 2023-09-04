@@ -48,15 +48,26 @@ const options = {
   },
   apis: ["./routes/*.js"],
 };
+const uiOpts = {
+  customSiteTitle: "Campus dev",
+  customfavIcon: "/assets/favicon.ico",
+};
+app.use("/assets", express.static("assets"));
 
+/*
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, uiOpts));
+*/
 const specs = swaggerJsdoc(options);
 app.use(
   "/",
   swaggerUi.serve,
-  swaggerUi.setup(specs, { customCssUrl: CSS_URL, explorer: true })
+  swaggerUi.setup(specs, uiOpts, {
+    customCssUrl: CSS_URL,
+    explorer: true,
+  })
 );
-app.use("/api/user/", userRoutes);
-app.use("/api/auth/", authRoutes);
+app.use("/user", userRoutes);
+app.use("/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`server running on Port ${PORT}`);

@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema(
       max: 50,
       unique: true,
     },
+    phonenumber: {
+      type: Number,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
@@ -35,6 +39,11 @@ const UserSchema = new mongoose.Schema(
     followings: {
       type: Array,
       default: [],
+    },
+    verifed: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
     isAdmin: {
       type: Boolean,

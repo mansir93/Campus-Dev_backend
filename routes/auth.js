@@ -45,7 +45,7 @@ const router = require("express").Router();
  *   name: Authentication
  *   description: 
 
-* /register:
+* /auth/register:
 *   post:
 *     summary: Register a new user
 *     tags:
@@ -81,7 +81,7 @@ router.post("/register", register);
 
 /**
  *  @swagger
- * /login:
+ * /auth/login:
  *     post:
  *       summary: User login
  *       tags:
