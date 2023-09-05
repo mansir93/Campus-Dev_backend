@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const helmet = require("helmet");
 const morgan = require("morgan");
+const cors = require("cors");
+
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
@@ -16,6 +18,10 @@ const PORT = process.env.PORT || 5001;
 connectDB();
 
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
+
 
 // middleware
 app.use(express.json());
