@@ -2,7 +2,6 @@ const asyncHandler = require("express-async-handler");
 const Post = require("../models/postModel");
 const User = require("../models/userModel");
 
-
 // createpost
 exports.createPost = asyncHandler(async (req, res, next) => {
   try {
@@ -190,14 +189,14 @@ exports.getSinglePost = asyncHandler(async (req, res) => {
 
 exports.getTimelinePost = asyncHandler(async (req, res) => {
   try {
-    const currentUser = await User.findById(req.params.id);
-    if (!currentUser) {
+    const user = await User.findById(req.params.id);
+    if (!user) {
       return res.status(404).json({ message: "user not found" });
     }
-    const userPosts = await Post.find({ user: currentUser._id });
+    const userPosts = await Post.find({ user: user._id });
 
     const friendPosts = await Promise.all(
-      currentUser.followings.map(async (friendId) => {
+      user.followings.map(async (friendId) => {
         const friendPosts = await Post.find({ user: friendId });
         return friendPosts;
       })
@@ -205,9 +204,77 @@ exports.getTimelinePost = asyncHandler(async (req, res) => {
 
     const timelinePosts = [...userPosts, ...friendPosts.flat()];
 
-    res.json(timelinePosts);
+    res.status(400).json(timelinePosts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+exports.getPostsBaseUser = asyncHandler(async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch the user's posts
+    const userPosts = await Post.find({ user: user._id });
+
+    const friendPosts = await Promise.all(
+      user.followings.map(async (friendId) => {
+        const friendPosts = await Post.find({ user: friendId });
+        return friendPosts;
+      })
+    );
+
+    const allFriendPosts = friendPosts.flat();
+
+    const followers = await User.find({ _id: { $in: user.followers } });
+    const randomFollowerPosts = [];
+
+    followers.forEach((follower) => {
+      const randomCount = 3;
+      const randomIndexes = [];
+
+      while (randomIndexes.length < randomCount) {
+        const randomIndex = Math.floor(Math.random() * follower.posts.length);
+        if (!randomIndexes.includes(randomIndex)) {
+          randomIndexes.push(randomIndex);
+          randomFollowerPosts.push(follower.posts[randomIndex]);
+        }
+      }
+    });
+
+    const randomPosts = await Post.aggregate([{ $sample: { size: 5 } }]);
+
+    const Posts = [
+      ...userPosts,
+      ...allFriendPosts,
+      ...randomFollowerPosts,
+      ...randomPosts,
+    ];
+
+    res.status(200).json(Posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+exports.getAllPosts = asyncHandler(async (req, res) => {
+  // try {
+    const allPosts = await Post.find();
+    if (!allPosts) {
+      return res.status(404).json({ message: "something is wrong" });
+    }
+    const randomPosts = await Post.aggregate([{ $sample: { size: 10 } }]);
+
+    const combinedPosts = [...allPosts, ...randomPosts];
+
+    res.status(200).json(combinedPosts);
+  // } catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ message: "Internal server error" });
+  // }
 });

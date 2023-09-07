@@ -9,7 +9,9 @@ const {
   dislikePost,
   commentPost,
   deleteComment,
+  getAllPosts,
   getSinglePost,
+  getPostsBaseUser,
   getTimelinePost,
 } = require("../controllers/postController");
 
@@ -27,7 +29,11 @@ router.put("/:id/dislike", isAuthenticated, dislikePost);
 router.put("/:id/comment", isAuthenticated, commentPost);
 router.delete("/:postid/comment/:commentid", isAuthenticated, deleteComment);
 
+router.get("/", isAuthenticated, getPostsBaseUser);
 router.get("/:id", getSinglePost);
+router.get("/explore", getAllPosts); // error
 router.get("/timeline/:id", getTimelinePost);
+
+
 
 module.exports = router;

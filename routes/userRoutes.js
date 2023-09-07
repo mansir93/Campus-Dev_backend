@@ -6,12 +6,16 @@ const {
   updateUser,
   deleteUser,
   getSingleUser,
+  getAllUsers,
+  getSuggestedUsers,
+  getUserSuggests,
   followUser,
   unfollowUser,
+  userfollowers,
+  userfollowings,
 } = require("../controllers/userController");
 
 // router.use(isAuthenticated)
-
 
 /**
  * @swagger
@@ -73,7 +77,7 @@ router.put("/:id", isAuthenticated, updateUser);
  */
 
 // delete user
-router.delete("/:id",isAuthenticated, deleteUser);
+router.delete("/:id", isAuthenticated, deleteUser);
 
 /**
  * @swagger
@@ -143,5 +147,11 @@ router.put("/:id/follow", isAuthenticated, followUser);
 
 // unfollow user
 router.put("/:id/unfollow", isAuthenticated, unfollowUser);
+
+router.get("/", getAllUsers);
+// router.get("/suggestions", isAuthenticated, getSuggestedUsers); //error
+router.get("/suggestions", isAuthenticated, getUserSuggests); // error
+router.get("/followers/:id", isAuthenticated, userfollowers);
+router.get("/following/:id", isAuthenticated, userfollowings);
 
 module.exports = router;
