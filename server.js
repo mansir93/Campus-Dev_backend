@@ -8,8 +8,12 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const connectDB = require("./config/dbConnection");
-const userRoutes = require("./routes/userRoutes");
+
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/userRoutes");
+const postRoutes = require("./routes/postRoutes");
+
+const ErrorHandler = require("./middleware/errorHandler");
 
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
@@ -22,14 +26,16 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors());
 
-
 // middleware
+app.use(ErrorHandler);
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
-app.use("/user/", userRoutes);
+// routes
 app.use("/auth/", authRoutes);
+app.use("/user/", userRoutes);
+app.use("/post/", postRoutes);
 
 const options = {
   definition: {
@@ -62,10 +68,6 @@ const uiOpts = {
   customfavIcon: "/assets/favicon.ico",
 };
 app.use("/assets", express.static("assets"));
-
-/*
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, uiOpts));
-*/
 const specs = swaggerJsdoc(options);
 app.use(
   "/",

@@ -1,5 +1,7 @@
 const express = require("express");
 const router = require("express").Router();
+const { isAuthenticated } = require("../middleware/auth");
+
 const {
   updateUser,
   deleteUser,
@@ -7,6 +9,9 @@ const {
   followUser,
   unfollowUser,
 } = require("../controllers/userController");
+
+// router.use(isAuthenticated)
+
 
 /**
  * @swagger
@@ -45,7 +50,7 @@ const {
  */
 
 // update user
-router.put("/:id", updateUser);
+router.put("/:id", isAuthenticated, updateUser);
 
 /**
  * @swagger
@@ -68,7 +73,7 @@ router.put("/:id", updateUser);
  */
 
 // delete user
-router.delete("/:id", deleteUser);
+router.delete("/:id",isAuthenticated, deleteUser);
 
 /**
  * @swagger
@@ -91,7 +96,7 @@ router.delete("/:id", deleteUser);
  */
 
 // get a user
-router.get("/:id", getSingleUser);
+router.get("/:id", isAuthenticated, getSingleUser);
 
 /**
  * @swagger
@@ -114,8 +119,7 @@ router.get("/:id", getSingleUser);
  */
 
 // follow user
-router.put("/:id/follow", followUser);
-
+router.put("/:id/follow", isAuthenticated, followUser);
 
 /**
  * @swagger
@@ -137,7 +141,7 @@ router.put("/:id/follow", followUser);
  *         description: Invalid input or unfollow failed
  */
 
-
 // unfollow user
-router.put("/:id/unfollow", unfollowUser);
+router.put("/:id/unfollow", isAuthenticated, unfollowUser);
+
 module.exports = router;

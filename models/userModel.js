@@ -83,16 +83,16 @@ const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
       min: 3,
       max: 20,
       unique: true,
+      required: true,
     },
     email: {
       type: String,
-      required: true,
       max: 50,
       unique: true,
+      required: true,
     },
     phonenumber: {
       type: Number,
@@ -100,8 +100,8 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       min: 6,
+      required: true,
     },
     profile_pic: {
       type: String,
