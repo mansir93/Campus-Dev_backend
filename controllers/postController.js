@@ -269,6 +269,7 @@ exports.getAllPosts = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "something is wrong" });
     }
     const randomPosts = await Post.aggregate([{ $sample: { size: 10 } }]);
+    console.log(randomPosts);
 
     const combinedPosts = [...allPosts, ...randomPosts];
 

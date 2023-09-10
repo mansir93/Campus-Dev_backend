@@ -7,15 +7,12 @@ const {
   deleteUser,
   getSingleUser,
   getAllUsers,
-  getSuggestedUsers,
   getUserSuggests,
   followUser,
   unfollowUser,
   userfollowers,
   userfollowings,
 } = require("../controllers/userController");
-
-// router.use(isAuthenticated)
 
 /**
  * @swagger
@@ -26,10 +23,45 @@ const {
 
 /**
  * @swagger
+ * /user:
+ *   get:
+ *     summary: Get all users
+ *     tags: [user]
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved all users
+ *       '500':
+ *         description: Internal server error
+ */
+router.get("/", getAllUsers);
+
+/**
+ * @swagger
+ * /user/suggestions:
+ *   get:
+ *     summary: Get user suggestions
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved user suggestions
+ *       '401':
+ *         description: Unauthorized - user is not authenticated
+ *       '500':
+ *         description: Internal server error
+ */
+
+router.get("/suggestions", isAuthenticated, getUserSuggests);
+
+/**
+ * @swagger
  * /user/{id}:
  *   put:
  *     summary: Update a user
  *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -62,6 +94,8 @@ router.put("/:id", isAuthenticated, updateUser);
  *   delete:
  *     summary: Delete a user
  *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -85,6 +119,8 @@ router.delete("/:id", isAuthenticated, deleteUser);
  *   get:
  *     summary: Get a single user by ID
  *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -108,6 +144,8 @@ router.get("/:id", isAuthenticated, getSingleUser);
  *   put:
  *     summary: Follow a user
  *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -131,6 +169,8 @@ router.put("/:id/follow", isAuthenticated, followUser);
  *   put:
  *     summary: Unfollow a user
  *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -148,10 +188,60 @@ router.put("/:id/follow", isAuthenticated, followUser);
 // unfollow user
 router.put("/:id/unfollow", isAuthenticated, unfollowUser);
 
-router.get("/", getAllUsers);
-// router.get("/suggestions", isAuthenticated, getSuggestedUsers); //error
-router.get("/suggestions", isAuthenticated, getUserSuggests); // error
+/**
+ * @swagger
+ * /user/followers/{id}:
+ *   get:
+ *     summary: Get a user's followers
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the user whose followers you want to retrieve
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved user's followers
+ *       '401':
+ *         description: Unauthorized - user is not authenticated
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
+
 router.get("/followers/:id", isAuthenticated, userfollowers);
+
+/**
+ * @swagger
+ * /user/following/{id}:
+ *   get:
+ *     summary: Get a user's followings
+ *     tags: [user]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the user whose followings you want to retrieve
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved user's followings
+ *       '401':
+ *         description: Unauthorized - user is not authenticated
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
+
 router.get("/following/:id", isAuthenticated, userfollowings);
 
 module.exports = router;

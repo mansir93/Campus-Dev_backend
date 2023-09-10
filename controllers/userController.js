@@ -176,40 +176,6 @@ exports.userfollowings = asyncHandler(async (req, res) => {
   }
 });
 
-exports.getSuggestedUsers = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const followers = await User.find({ _id: { $in: user.followers } });
-    const followings = await User.find({ _id: { $in: user.followings } });
-    const suggestedUsers = [];
-
-    followers.forEach((follower) => {
-      if (!user.followings.includes(follower._id.toString())) {
-        suggestedUsers.push(follower);
-      }
-    });
-
-    followings.forEach((followedUser) => {
-      if (!user.followings.includes(followedUser._id.toString())) {
-        suggestedUsers.push(followedUser);
-      }
-    });
-
-    if (suggestedUsers.length === 0) {
-      return res.status(200).json({ message: "No suggested users found" });
-    }
-
-    res.status(200).json(suggestedUsers);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
 //get user to follow
 exports.getUserSuggests = async (req, res) => {
   try {
@@ -241,6 +207,7 @@ exports.getUserSuggests = async (req, res) => {
     );
 
     res.status(200).json(filteruser);
-  } catch (error) {}
+  } catch (error) {
+    res.json(error);
+  }
 };
-

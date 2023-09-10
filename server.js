@@ -36,9 +36,9 @@ app.use(morgan("common"));
 app.use("/auth/", authRoutes);
 app.use("/user/", userRoutes);
 app.use("/post/", postRoutes);
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Route not found. Please check the URL.' });
-});
+// app.use((req, res, next) => {
+//   res.status(404).json({ message: 'Route not found. Please check the URL.' });
+// });
 
 const options = {
   definition: {
