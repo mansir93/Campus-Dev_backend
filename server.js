@@ -15,9 +15,6 @@ const postRoutes = require("./routes/postRoutes");
 
 const ErrorHandler = require("./middleware/errorHandler");
 
-const CSS_URL =
-  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
-
 const PORT = process.env.PORT || 5001;
 connectDB();
 
@@ -66,12 +63,13 @@ const options = {
   },
   apis: ["./routes/*.js", "./models/*.js"],
 };
+const specs = swaggerJsdoc(options);
 const uiOpts = {
   customSiteTitle: "Campus dev",
-  customfavIcon: "/assets/favicon.ico",
+  customfavIcon: "",
 };
-app.use("/assets", express.static("assets"));
-const specs = swaggerJsdoc(options);
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
 app.use(
   "/",
   swaggerUi.serve,
