@@ -64,20 +64,15 @@ const options = {
   apis: ["./routes/*.js", "./models/*.js"],
 };
 const specs = swaggerJsdoc(options);
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
 const uiOpts = {
   customSiteTitle: "Campus dev",
   customfavIcon: "",
+  customCssUrl: CSS_URL,
+  explorer: true,
 };
-const CSS_URL =
-  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
-app.use(
-  "/",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, uiOpts, {
-    customCssUrl: CSS_URL,
-    explorer: true,
-  })
-);
+app.use("/", swaggerUi.serve, swaggerUi.setup(specs, uiOpts));
 
 app.listen(PORT, () => {
   console.log(`server running on Port ${PORT}`);
