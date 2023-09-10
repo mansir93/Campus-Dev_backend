@@ -46,8 +46,8 @@ const options = {
       description:
         "This is a Social Media API application made with Express and documented with Swagger",
       license: {
-        name: "MIT",
-        url: "https://spdx.org/licenses/MIT.html",
+        name: "DTD License",
+        url: "",
       },
       contact: {
         name: "Mansir Abdul Aziz",
