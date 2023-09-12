@@ -8,6 +8,8 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const connectDB = require("./config/dbConnection");
+const cloudinary = require('./config/cloudinaryConfig'); 
+
 
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/userRoutes");
@@ -67,10 +69,10 @@ const specs = swaggerJsdoc(options);
 
 const UIopts = {
   customSiteTitle: "Campus dev",
+  explorer: true,
   customfavIcon: "",
   customCssUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css",
-  explorer: true,
 };
 app.use("/", swaggerUi.serve, swaggerUi.setup(specs, UIopts));
 

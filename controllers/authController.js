@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const cloudinary = require("cloudinary").v2;
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
@@ -21,12 +22,25 @@ exports.register = asyncHandler(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
+  // Upload the image to Cloudinary
+  // Optimize the image before uploading
+  const optimizedImage = await cloudinary.uploader.upload(
+    req.file.buffer.toString("base64"),
+    {
+      quality: "auto:best", // Auto-quality optimization
+      width: 800, // Resize to a maximum width of 800 pixels
+      crop: "limit", // Crop to fit the specified dimensions
+      format: "auto", // Automatically determine the best format (e.g., WebP)
+    }
+  );
+
   // create user
   const user = await User.create({
     username,
     email,
     phonenumber,
     password: hashedPassword,
+    profile_pic: optimizedImage.secure_url,
   });
   if (user) {
     res.status(201).json({ user });

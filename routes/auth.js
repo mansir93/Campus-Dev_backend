@@ -2,6 +2,10 @@ const express = require("express");
 const { register, login } = require("../controllers/authController");
 
 const router = require("express").Router();
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+const optimizeImage = require('../middleware/optimizeImage');
 
 /**
  * @swagger
@@ -41,7 +45,7 @@ const router = require("express").Router();
 *
 *
  */
-router.post("/register", register);
+router.post("/register",optimizeImage, upload.single('image'), register);
 
 /**
  *  @swagger
