@@ -13,12 +13,9 @@ const mongoose = require("mongoose");
  *         title:
  *           type: string
  *           description: The title of the post.
- *         image:
- *           type: string
- *           description: The URL or reference to an image associated with the post (optional).
- *         video:
- *           type: string
- *           description: The URL or reference to a video associated with the post (optional).
+ *         media:
+ *           type: array
+ *           description: The URL or reference to an image associated with the post (required).
  *         like:
  *           type: array
  *           items:
@@ -58,18 +55,19 @@ const PostSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: String,
-      // required:true
-    },
-    video: {
-      type: String,
+
+    media: {
+      type: Array,
+      default: [],
+      required: true,
     },
     like: {
       type: Array,
+      default: [],
     },
     dislike: {
       type: Array,
+      default: [],
     },
     comments: [
       {

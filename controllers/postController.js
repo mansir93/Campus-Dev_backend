@@ -5,11 +5,39 @@ const User = require("../models/userModel");
 // createpost
 exports.createPost = asyncHandler(async (req, res, next) => {
   try {
-    const { title, image, video } = req.body;
+    const { title } = req.body;
+    const { files } = req;
+    if (!files || files.length === 0) {
+      res.status(400);
+      throw new Error("No files uploaded");
+    }
+
+    const uploadedMedia = await Promise.all(
+      files.map(async (file) => {
+        let transformation = [
+          { width: 800, height: 600, crop: "fill" },
+          { quality: "auto" },
+        ];
+
+        if (file.mimetype.includes("image")) {
+          // transformation.push({ overlay: 'your_watermark_image', gravity: 'south_east', x: 10, y: 10 });
+        } else if (file.mimetype.includes("video")) {
+          // transformation.push({ video_bitrate: '300k' });
+        }
+
+        const result = await cloudinary.uploader.upload(file.path, {
+          transformation,
+        });
+        return {
+          url: result.secure_url,
+          public_id: result.public_id,
+        };
+      })
+    );
+
     const newpost = await Post.create({
       title,
-      image,
-      video,
+      media: uploadedMedia,
       user: req.user.id,
     });
     if (newpost) {
@@ -264,16 +292,16 @@ exports.getPostsBaseUser = asyncHandler(async (req, res) => {
 
 exports.getAllPosts = asyncHandler(async (req, res) => {
   // try {
-    const allPosts = await Post.find();
-    if (!allPosts) {
-      return res.status(404).json({ message: "something is wrong" });
-    }
-    const randomPosts = await Post.aggregate([{ $sample: { size: 10 } }]);
-    console.log(randomPosts);
+  const allPosts = await Post.find();
+  if (!allPosts) {
+    return res.status(404).json({ message: "something is wrong" });
+  }
+  const randomPosts = await Post.aggregate([{ $sample: { size: 10 } }]);
+  console.log(randomPosts);
 
-    const combinedPosts = [...allPosts, ...randomPosts];
+  const combinedPosts = [...allPosts, ...randomPosts];
 
-    res.status(200).json(combinedPosts);
+  res.status(200).json(combinedPosts);
   // } catch (err) {
   //   console.error(err);
   //   res.status(500).json({ message: "Internal server error" });

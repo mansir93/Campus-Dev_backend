@@ -22,15 +22,14 @@ exports.register = asyncHandler(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Upload the image to Cloudinary
-  // Optimize the image before uploading
+  // Optimize the image before uploading to Cloudinary
   const optimizedImage = await cloudinary.uploader.upload(
     req.file.buffer.toString("base64"),
     {
-      quality: "auto:best", // Auto-quality optimization
-      width: 800, // Resize to a maximum width of 800 pixels
-      crop: "limit", // Crop to fit the specified dimensions
-      format: "auto", // Automatically determine the best format (e.g., WebP)
+      quality: "auto:best", 
+      width: 800, 
+      crop: "limit", 
+      format: "auto", 
     }
   );
 

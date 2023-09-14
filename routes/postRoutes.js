@@ -37,8 +37,8 @@ const {
  *         application/json:
  *           example:
  *             title: "Sample Post"
- *             image: "https://example.com/sample-image.jpg"
- *             video: "https://example.com/sample-video.mp4"
+ *             media: ["https://example.com/sample-image.jpg"]
+ *
  *     responses:
  *       '201':
  *         description: Post created successfully
