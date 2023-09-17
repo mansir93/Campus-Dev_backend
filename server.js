@@ -8,8 +8,7 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const connectDB = require("./config/dbConnection");
-const cloudinary = require('./config/cloudinaryConfig'); 
-
+const cloudinary = require("./config/cloudinaryConfig");
 
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/userRoutes");
@@ -21,9 +20,13 @@ const PORT = process.env.PORT || 5001;
 connectDB();
 
 const app = express();
-
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+  exposedHeaders: ["Authorization"],
+};
 // Enable CORS for all routes
-app.use(cors());
+app.use(cors(corsOptions));
 
 // middleware
 app.use(ErrorHandler);
