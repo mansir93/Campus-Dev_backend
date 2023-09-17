@@ -20,13 +20,9 @@ const PORT = process.env.PORT || 5001;
 connectDB();
 
 const app = express();
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true,
-  exposedHeaders: ["Authorization"],
-};
+
 // Enable CORS for all routes
-app.use(cors(corsOptions));
+app.use(cors());
 
 // middleware
 app.use(ErrorHandler);
