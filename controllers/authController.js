@@ -7,9 +7,9 @@ const { json } = require("express");
 
 // register
 exports.register = asyncHandler(async (req, res, next) => {
-  const { username, email, password, phonenumber } = req.body;
+  const { firstname, lastname, email, password } = req.body;
 
-  if (!username || !email || !password || !phonenumber) {
+  if (!email || !password) {
     res.status(400).json("All fields are required");
   }
   const userAvailble = await User.findOne({ email });
@@ -34,16 +34,16 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   // create user
   const user = await User.create({
-    username,
+    firstname,
+    lastname,
     email,
-    phonenumber,
     password: hashedPassword,
     profile_pic: optimizedImage.secure_url,
   });
   if (user) {
     res.status(201).json({ user });
   } else {
-    res.status(400),json("Data is not valid");
+    res.status(400), json("Data is not valid");
   }
 });
 
