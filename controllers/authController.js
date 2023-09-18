@@ -21,24 +21,12 @@ exports.register = asyncHandler(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Optimize the image before uploading to Cloudinary
-  const optimizedImage = await cloudinary.uploader.upload(
-    req.file.buffer.toString("base64"),
-    {
-      quality: "auto:best",
-      width: 800,
-      crop: "limit",
-      format: "auto",
-    }
-  );
-
   // create user
   const user = await User.create({
     firstname,
     lastname,
     email,
     password: hashedPassword,
-    profile_pic: optimizedImage.secure_url,
   });
   if (user) {
     res.status(201).json({ user });
