@@ -26,10 +26,10 @@ exports.register = asyncHandler(async (req, res, next) => {
   const optimizedImage = await cloudinary.uploader.upload(
     req.file.buffer.toString("base64"),
     {
-      quality: "auto:best", 
-      width: 800, 
-      crop: "limit", 
-      format: "auto", 
+      quality: "auto:best",
+      width: 800,
+      crop: "limit",
+      format: "auto",
     }
   );
 
@@ -51,32 +51,36 @@ exports.register = asyncHandler(async (req, res, next) => {
 
 // login
 exports.login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res.status(400);
-    throw new Error("All fields are required");
-  }
-  const user = await User.findOne({ email });
-  if (!user) {
-    res.status(404);
-    throw new Error("user not found");
-  }
-  // compare password with hashPassword
-  if (user && (await bcrypt.compare(password, user.password))) {
-    const token = jwt.sign(
-      {
-        user: {
-          username: user.username,
-          email: user.email,
-          id: user.id,
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400);
+      throw new Error("All fields are required");
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(404);
+      throw new Error("user not found");
+    }
+    // compare password with hashPassword
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const token = jwt.sign(
+        {
+          user: {
+            username: user.username,
+            email: user.email,
+            id: user.id,
+          },
         },
-      },
-      process.env.TOKEN_SECRET,
-      { expiresIn: "30m" }
-    );
-    res.status(200).json({ token });
-  } else {
-    res.status(401);
-    throw new Error("Incorrect Logins");
+        process.env.TOKEN_SECRET,
+        { expiresIn: "30m" }
+      );
+      res.status(200).json({ token });
+    } else {
+      res.status(401);
+      throw new Error("Incorrect Logins");
+    }
+  } catch (error) {
+    console.log('Error', error);
   }
 });
