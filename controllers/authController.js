@@ -54,8 +54,8 @@ exports.login = asyncHandler(async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      res.status(400);
-      throw new Error("All fields are required");
+      res.status(400).json("All fields are required");
+      // throw new Error("All fields are required");
     }
     const user = await User.findOne({ email });
     if (!user) {
@@ -81,6 +81,6 @@ exports.login = asyncHandler(async (req, res) => {
       throw new Error("Incorrect Logins");
     }
   } catch (error) {
-    console.log('Error', error);
+    console.log("Error", error);
   }
 });
