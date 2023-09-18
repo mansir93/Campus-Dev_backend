@@ -165,5 +165,11 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+UserSchema.pre("save", function (next) {
+  if (!this.username) {
+    this.username = this._id.toString();
+  }
+  next();
+});
 
 module.exports = mongoose.model("User", UserSchema);
