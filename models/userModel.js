@@ -10,6 +10,14 @@ const mongoose = require("mongoose");
  *         id:
  *           type: string
  *           description: The unique identifier for the user.
+ *         firstname:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
+ *         lastname:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 20
  *         username:
  *           type: string
  *           minLength: 3
@@ -81,12 +89,22 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
+    firstname: {
+      type: String,
+      min: 3,
+      max: 20,
+    },
+    lastname: {
+      type: String,
+      min: 3,
+      max: 20,
+    },
     username: {
       type: String,
       min: 3,
       max: 20,
       unique: true,
-      required: true,
+      // required: true,
     },
     email: {
       type: String,
@@ -96,7 +114,7 @@ const UserSchema = new mongoose.Schema(
     },
     phonenumber: {
       type: Number,
-      required: true,
+      // required: true,
     },
     password: {
       type: String,
@@ -121,7 +139,7 @@ const UserSchema = new mongoose.Schema(
     },
     verifed: {
       type: Boolean,
-      required: true,
+      // required: true,
       default: false,
     },
     isAdmin: {
@@ -145,7 +163,7 @@ const UserSchema = new mongoose.Schema(
       enum: [1, 2, 3],
     },
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("User", UserSchema);

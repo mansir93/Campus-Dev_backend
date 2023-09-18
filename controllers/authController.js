@@ -3,19 +3,18 @@ const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const { json } = require("express");
 
 // register
 exports.register = asyncHandler(async (req, res, next) => {
   const { username, email, password, phonenumber } = req.body;
 
   if (!username || !email || !password || !phonenumber) {
-    res.status(400);
-    throw new Error("All fields are required");
+    res.status(400).json("All fields are required");
   }
   const userAvailble = await User.findOne({ email });
   if (userAvailble) {
-    res.status(400);
-    throw new Error("user already registered");
+    res.status(400).json("user already registered");
   }
 
   // hash password
@@ -44,8 +43,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   if (user) {
     res.status(201).json({ user });
   } else {
-    res.status(400);
-    throw new Error("Data is not valid");
+    res.status(400),json("Data is not valid");
   }
 });
 
