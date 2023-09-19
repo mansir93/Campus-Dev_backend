@@ -23,7 +23,7 @@ const app = express();
 
 // Enable CORS for all routes
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://campus-dev.vercel.app"],
   credentials: true,
   exposedHeaders: ["Authorization"],
 };
