@@ -56,7 +56,7 @@ exports.login = asyncHandler(async (req, res) => {
         },
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: "30m" }
+      { expiresIn: "365d" }
     );
     res.status(200).json({ token });
   } else {

@@ -14,6 +14,11 @@ const {
   getPostsBaseUser,
   getTimelinePost,
 } = require("../controllers/postController");
+const multer = require("multer");
+
+// Set up multer for handling file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 /**
  * @swagger
@@ -59,7 +64,7 @@ const {
  *       '500':
  *         description: Internal server error
  */
-router.post("/create", isAuthenticated, createPost);
+router.post("/create", isAuthenticated, upload.array("images"), createPost);
 
 /**
  * @swagger

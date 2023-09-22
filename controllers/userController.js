@@ -1,5 +1,7 @@
+const cloudinary = require("cloudinary").v2;
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
+
 
 // updateUser
 exports.updateUser = asyncHandler(async (req, res) => {

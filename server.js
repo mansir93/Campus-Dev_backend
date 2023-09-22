@@ -3,12 +3,19 @@ const dotenv = require("dotenv").config();
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
+const cloudinary = require("cloudinary").v2;
 
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const connectDB = require("./config/dbConnection");
-const cloudinary = require("./config/cloudinaryConfig");
+// const cloudinary = require("./config/cloudinaryConfig");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/userRoutes");
@@ -63,7 +70,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:5000",
+        url: "https://api-campus-dev.vercel.app",
       },
     ],
   },

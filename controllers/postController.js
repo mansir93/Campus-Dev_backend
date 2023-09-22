@@ -1,56 +1,57 @@
+const cloudinary = require("cloudinary").v2;
 const asyncHandler = require("express-async-handler");
 const Post = require("../models/postModel");
 const User = require("../models/userModel");
+const sharp = require("sharp"); // Add sharp for image optimization
 
 // createpost
-exports.createPost = asyncHandler(async (req, res, next) => {
-  try {
-    const { title } = req.body;
-    const { files } = req;
-    if (!files || files.length === 0) {
-      res.status(400);
-      throw new Error("No files uploaded");
-    }
+exports.createPost = asyncHandler(async (req, res) => {
+  const { title } = req.body;
+  const media = req.files;
+  console.log("media", media);
 
-    const uploadedMedia = await Promise.all(
-      files.map(async (file) => {
-        let transformation = [
-          { width: 800, height: 600, crop: "fill" },
-          { quality: "auto" },
-        ];
+  if (!title || !media) {
+    res.status(404).json("no media");
+  }
+  const uploadedImages = [];
 
-        if (file.mimetype.includes("image")) {
-          // transformation.push({ overlay: 'your_watermark_image', gravity: 'south_east', x: 10, y: 10 });
-        } else if (file.mimetype.includes("video")) {
-          // transformation.push({ video_bitrate: '300k' });
+  for (const file of media) {
+    let transformation = [
+      { width: 800, height: 600, crop: "fill" },
+      { quality: "auto" },
+    ];
+
+    try {
+      const result = await cloudinary.uploader.upload(
+        file.originalname,
+        {
+          folder: "",
+          resource_type: "image",
         }
+        // {
+        //   transformation,
+        // }
+      );
 
-        const result = await cloudinary.uploader.upload(file.path, {
-          transformation,
-        });
-        return {
-          url: result.secure_url,
-          public_id: result.public_id,
-        };
-      })
-    );
-
-    const newpost = await Post.create({
-      title,
-      media: uploadedMedia,
-      user: req.user.id,
-    });
-    if (newpost) {
-      res.status(201).json({
-        success: true,
-        newpost,
-      });
-    } else {
-      res.status(400);
-      throw new Error("something wrong");
+      uploadedImages.push(result.secure_url);
+    } catch (error) {
+      throw error;
     }
-  } catch (error) {
-    next(error);
+  }
+
+  console.log(uploadedImages);
+  const newpost = await Post.create({
+    user: req.user.id,
+    title,
+    media: uploadedImages,
+  });
+  if (newpost) {
+    res.status(201).json({
+      success: true,
+      newpost,
+    });
+  } else {
+    res.status(400).json({ message: "Something went wrong" });
   }
 });
 
