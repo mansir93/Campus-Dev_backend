@@ -5,11 +5,21 @@ const morgan = require("morgan");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 
+const passportConfig = require("./config/passport")
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const connectDB = require("./config/dbConnection");
+const ErrorHandler = require("./middleware/errorHandler");
 // const cloudinary = require("./config/cloudinaryConfig");
+const session = require("express-session");
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/userRoutes");
+const postRoutes = require("./routes/postRoutes");
+
+const PORT = process.env.PORT || 5001;
+const app = express();
+connectDB();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -17,16 +27,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/userRoutes");
-const postRoutes = require("./routes/postRoutes");
+const passport = require("passport");
 
-const ErrorHandler = require("./middleware/errorHandler");
-
-const PORT = process.env.PORT || 5001;
-connectDB();
-
-const app = express();
+app.use(
+  session({
+    secret: process.env.TOKEN_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 // Enable CORS for all routes
 const corsOptions = {
@@ -35,6 +44,10 @@ const corsOptions = {
   exposedHeaders: ["Authorization"],
 };
 app.use(cors(corsOptions));
+
+// Initialize Passport and session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // middleware
 app.use(ErrorHandler);

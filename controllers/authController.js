@@ -4,6 +4,7 @@ const cloudinary = require("cloudinary").v2;
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const { json } = require("express");
+const passport = require("passport");
 
 // register
 exports.register = asyncHandler(async (req, res, next) => {
@@ -34,6 +35,29 @@ exports.register = asyncHandler(async (req, res, next) => {
     res.status(400), json("Data is not valid");
   }
 });
+
+// Callback route for Google OAuth registration
+exports.googleCallback = (req, res, next) => {
+  passport.authenticate("google", async (err, user) => {
+    console.log(user);
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+    }
+    const existingUser = await User.findOne({ email: googleUser.email });
+    if (existingUser) {
+    }
+    const newUser = User.create({
+      firstname: googleUser.firstName,
+      lastname: googleUser.lastName,
+      email: googleUser.email,
+    });
+    if (newUser) {
+      res.status(201).json({ newUser });
+    }
+  })(req, res, next);
+};
 
 // login
 exports.login = asyncHandler(async (req, res) => {

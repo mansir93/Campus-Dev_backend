@@ -22,24 +22,30 @@ exports.createPost = asyncHandler(async (req, res) => {
     ];
 
     try {
+      // cloudinary.v2.uploader
+      // .upload('20220503_180317.jpg', {
+      //   folder: '',
+      //   resource_type: 'image'})
+      // .then(console.log);
+
       const result = await cloudinary.uploader.upload(
+        // filename, folder, resource_type
         file.originalname,
         {
-          folder: "",
-          resource_type: "image",
+          transformation,
+          resource_type: file.mimetype,
+          folder: ''
         }
-        // {
-        //   transformation,
-        // }
-      );
+      ).then(res => console.log(res))
 
       uploadedImages.push(result.secure_url);
     } catch (error) {
+      console.log(error)
       throw error;
     }
   }
 
-  console.log(uploadedImages);
+  console.log("upload image",uploadedImages);
   const newpost = await Post.create({
     user: req.user.id,
     title,

@@ -1,17 +1,23 @@
 const express = require("express");
-const { register, login } = require("../controllers/authController");
+const {
+  register,
+  login,
+  googleCallback,
+} = require("../controllers/authController");
 
 const router = require("express").Router();
-const multer = require('multer');
+const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const optimizeImage = require('../middleware/optimizeImage');
+const passport = require("passport");
+
+const optimizeImage = require("../middleware/optimizeImage");
 
 /**
  * @swagger
  *  tags:
  *   name: Authentication
- *   description: 
+ *   description:
 
 * /auth/register:
 *   post:
@@ -45,7 +51,7 @@ const optimizeImage = require('../middleware/optimizeImage');
 *
 *
  */
-router.post("/register",optimizeImage, upload.single('image'), register);
+router.post("/register", optimizeImage, upload.single("image"), register);
 
 /**
  *  @swagger
@@ -76,5 +82,42 @@ router.post("/register",optimizeImage, upload.single('image'), register);
  *
  */
 router.post("/login", login);
+
+router.get("/login/success", (req, res) => {
+  if (req.user) {
+    res.status(200).json({
+      success: true,
+      message: "Successfully loged in",
+      user: req.user,
+    });
+  } else {
+    res.status(403).json({
+      error: true,
+      message: "Not Authorized",
+    });
+  }
+});
+router.get("/login/failed", (req, res) => {
+  res.status(401).json({
+    error: true,
+    message: "Log in failure",
+  });
+});
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    successRedirect: process.env.CLIENT_URL,
+    failureRedirect: "/login/failed",
+  })
+);
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+router.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect(process.env.CLIENT_URL);
+});
 
 module.exports = router;
