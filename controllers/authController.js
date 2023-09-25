@@ -10,12 +10,12 @@ const passport = require("passport");
 exports.register = asyncHandler(async (req, res, next) => {
   const { firstname, lastname, email, password } = req.body;
 
-  if (!email || !password) {
-    res.status(400).json("All fields are required");
+  if (!firstname || !lastname || !email || !password) {
+    throw Object.assign(new Error("All fields are required"), { status: 400 });
   }
   const userAvailble = await User.findOne({ email });
   if (userAvailble) {
-    res.status(400).json("user already registered");
+    throw Object.assign(new Error("user already registered"), { status: 400 });
   }
 
   // hash password
@@ -32,7 +32,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   if (user) {
     res.status(201).json({ user });
   } else {
-    res.status(400), json("Data is not valid");
+    throw Object.assign(new Error("Data is not valid"), { status: 400 });
   }
 });
 
@@ -45,17 +45,18 @@ exports.googleCallback = (req, res, next) => {
     }
     if (!user) {
     }
-    const existingUser = await User.findOne({ email: googleUser.email });
+    const existingUser = await User.findOne({ email: user.email });
     if (existingUser) {
+      console.log(existingUser);
     }
-    const newUser = User.create({
-      firstname: googleUser.firstName,
-      lastname: googleUser.lastName,
-      email: googleUser.email,
-    });
-    if (newUser) {
-      res.status(201).json({ newUser });
-    }
+    // const newUser = User.create({
+    //   firstname: user.firstName,
+    //   lastname: user.lastName,
+    //   email: user.email,
+    // });
+    // if (newUser) {
+    //   res.status(201).json({ newUser });
+    // }
   })(req, res, next);
 };
 
@@ -63,11 +64,11 @@ exports.googleCallback = (req, res, next) => {
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    res.status(400).json("All fields are required");
+    throw Object.assign(new Error("All fields are required"), { status: 400 });
   }
   const user = await User.findOne({ email });
   if (!user) {
-    res.status(404).json("user not found");
+    throw Object.assign(new Error("user not found"), { status: 404 });
   }
   // compare password with hashPassword
   if (user && (await bcrypt.compare(password, user.password))) {
@@ -84,6 +85,6 @@ exports.login = asyncHandler(async (req, res) => {
     );
     res.status(200).json({ token });
   } else {
-    res.status(401).json("Incorrect Logins");
+    throw Object.assign(new Error("password Incorrect"), { status: 401 });
   }
 });

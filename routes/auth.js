@@ -51,7 +51,7 @@ const optimizeImage = require("../middleware/optimizeImage");
 *
 *
  */
-router.post("/register", optimizeImage, upload.single("image"), register);
+router.post("/register", register);
 
 /**
  *  @swagger
@@ -104,13 +104,14 @@ router.get("/login/failed", (req, res) => {
   });
 });
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    successRedirect: process.env.CLIENT_URL,
-    failureRedirect: "/login/failed",
-  })
-);
+router.get("/google/callback", googleCallback);
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", {
+//     successRedirect: process.env.CLIENT_URL,
+//     failureRedirect: "/login/failed",
+//   })
+// );
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })

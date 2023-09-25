@@ -11,13 +11,12 @@ const errorHandler = (err, req, res, next) => {
   const statusName = httpStatusCodes[status] || "Unknown Error";
   const title = err.title || statusName;
 
+  console.log(err)
   res.status(status).json({
-    error: {
       status: status,
       title: title,
       message: err.message || statusName,
       StackTrace: err.stack,
-    },
   });
 };
 

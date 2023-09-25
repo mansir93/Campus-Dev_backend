@@ -2,113 +2,103 @@ const cloudinary = require("cloudinary").v2;
 const asyncHandler = require("express-async-handler");
 const Post = require("../models/postModel");
 const User = require("../models/userModel");
+const base64url = require("base64url");
+
 const sharp = require("sharp"); // Add sharp for image optimization
 
 // createpost
 exports.createPost = asyncHandler(async (req, res) => {
   const { title } = req.body;
-  const media = req.files;
-  console.log("media", media);
+  const { files } = req;
 
-  if (!title || !media) {
-    res.status(404).json("no media");
+  if (!title || !files) {
+    throw Object.assign(new Error("No Media"), { status: 404 });
   }
+
   const uploadedImages = [];
 
-  for (const file of media) {
-    let transformation = [
+  for (const file of files) {
+    const transformation = [
       { width: 800, height: 600, crop: "fill" },
       { quality: "auto" },
     ];
-
+    const base64Data = file.buffer.toString("base64");
     try {
-      // cloudinary.v2.uploader
-      // .upload('20220503_180317.jpg', {
-      //   folder: '',
-      //   resource_type: 'image'})
-      // .then(console.log);
-
       const result = await cloudinary.uploader.upload(
-        // filename, folder, resource_type
-        file.originalname,
+        `data:${file.mimetype};base64,${base64Data}`,
         {
           transformation,
-          resource_type: file.mimetype,
-          folder: ''
+          resource_type: "auto",
         }
-      ).then(res => console.log(res))
-
+      );
       uploadedImages.push(result.secure_url);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw error;
     }
   }
 
-  console.log("upload image",uploadedImages);
+  console.log("upload image", uploadedImages);
   const newpost = await Post.create({
     user: req.user.id,
     title,
     media: uploadedImages,
   });
   if (newpost) {
+    console.log(newpost);
     res.status(201).json({
       success: true,
       newpost,
     });
   } else {
-    res.status(400).json({ message: "Something went wrong" });
+    throw Object.assign(new Error("Something went wrong"), { status: 400 });
   }
 });
 
 //update a post
 exports.updatePost = asyncHandler(async (req, res, next) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-    if (post.user.toString() !== req.user.id) {
-      await Post.findByIdAndUpdate(req.params.id, {
-        $set: req.body,
-      });
-      res
-        .status(200)
-        .json({ success: true, message: "the post has been updated" });
-    } else {
-      return res.status(403).json({ error: "You can update only your post" });
-    }
-  } catch (error) {
-    next(error);
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  if (post.user.toString() !== req.user.id) {
+    await Post.findByIdAndUpdate(req.params.id, {
+      $set: req.body,
+    });
+    res
+      .status(200)
+      .json({ success: true, message: "the post has been updated" });
+  } else {
+    throw Object.assign(new Error("You can update only your post"), {
+      status: 403,
+    });
   }
 });
 
 //Delete a post
 exports.deletePost = asyncHandler(async (req, res, next) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-    if (post.user.toString() === req.user.id) {
-      await post.findByIdAndDelete(req.params.id);
-      res
-        .status(200)
-        .json({ success: true, message: "the post has been deleted" });
-    } else {
-      return res.status(403).json({ error: "You can Delete only your post" });
-    }
-  } catch (error) {
-    next(error);
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  if (post.user.toString() === req.user.id) {
+    await post.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "the post has been deleted" });
+  } else {
+    throw Object.assign(new Error("You can Delete only your post"), {
+      status: 403,
+    });
   }
 });
 
 //Like a post
 exports.likePost = asyncHandler(async (req, res) => {
-  try {
+    3;
     const post = await Post.findById(req.params.id);
     if (!post) {
-      return res.status(404).json({ error: "Post not found" });
+      throw Object.assign(new Error("Post not found"), { status: 404 });
     }
     const userId = req.user.id;
 
@@ -122,17 +112,14 @@ exports.likePost = asyncHandler(async (req, res) => {
       await post.updateOne({ $pull: { like: userId } });
       return res.status(200).json("Post has been unlike");
     }
-  } catch (error) {
-    return res.status(500).json("Internal server error ");
-  }
+
 });
 
 //disLike a post
 exports.dislikePost = asyncHandler(async (req, res) => {
-  try {
     const post = await Post.findById(req.params.id);
     if (!post) {
-      return res.status(404).json({ error: "Post not found" });
+      throw Object.assign(new Error("Post not found"), { status: 404 });
     }
     const userId = req.user.id;
 
@@ -146,13 +133,10 @@ exports.dislikePost = asyncHandler(async (req, res) => {
       await post.updateOne({ $pull: { dislike: userId } });
       return res.status(200).json("Post has been unlike");
     }
-  } catch (error) {
-    return res.status(500).json("Internal server error ");
-  }
+
 });
 
 exports.commentPost = asyncHandler(async (req, res) => {
-  try {
     const { comment, profile } = req.body;
 
     const newComment = {
@@ -163,154 +147,127 @@ exports.commentPost = asyncHandler(async (req, res) => {
     };
     const post = await Post.findById(req.params.id);
 
-    console.log(post);
+    // console.log(post);
 
     if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+      throw Object.assign(new Error("Post not found"), { status: 404 });
     }
     post.comments.push(newComment);
     await post.save();
 
     res.status(200).json(post);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
 });
 
 exports.deleteComment = asyncHandler(async (req, res) => {
-  try {
     const { postid, commentid } = req.params;
     const post = await Post.findById(postid);
 
     if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+      throw Object.assign(new Error("Post not found"), { status: 404 });
     }
     const commentIndex = post.comments.findIndex(
       (comment) => comment._id.toString() === commentid
     );
 
     if (commentIndex === -1) {
-      return res.status(404).json({ message: "Comment not found" });
+      throw Object.assign(new Error("comment not found"), { status: 404 });
     }
     if (post.comments[commentIndex].user.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Unauthorized" });
+      throw Object.assign(new Error("Unauthorized"), { status: 403 });
     }
     post.comments.splice(commentIndex, 1);
 
     await post.save();
 
     res.status(200).json(post);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
+
 });
 
 // get endpoints
 
 //get a post
 exports.getSinglePost = asyncHandler(async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-    res.status(200).json(post);
-  } catch (err) {
-    res.status(500).json({ message: "Internal server error" });
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
   }
+  res.status(200).json(post);
 });
 
 exports.getTimelinePost = asyncHandler(async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: "user not found" });
-    }
-    const userPosts = await Post.find({ user: user._id });
-
-    const friendPosts = await Promise.all(
-      user.followings.map(async (friendId) => {
-        const friendPosts = await Post.find({ user: friendId });
-        return friendPosts;
-      })
-    );
-
-    const timelinePosts = [...userPosts, ...friendPosts.flat()];
-
-    res.status(400).json(timelinePosts);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    throw Object.assign(new Error("User not found"), { status: 404 });
   }
+  const userPosts = await Post.find({ user: user._id });
+
+  const friendPosts = await Promise.all(
+    user.followings.map(async (friendId) => {
+      const friendPosts = await Post.find({ user: friendId });
+      return friendPosts;
+    })
+  );
+
+  const timelinePosts = [...userPosts, ...friendPosts.flat()];
+
+  res.status(400).json(timelinePosts);
 });
 
 exports.getPostsBaseUser = asyncHandler(async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Fetch the user's posts
-    const userPosts = await Post.find({ user: user._id });
-
-    const friendPosts = await Promise.all(
-      user.followings.map(async (friendId) => {
-        const friendPosts = await Post.find({ user: friendId });
-        return friendPosts;
-      })
-    );
-
-    const allFriendPosts = friendPosts.flat();
-
-    const followers = await User.find({ _id: { $in: user.followers } });
-    const randomFollowerPosts = [];
-
-    followers.forEach((follower) => {
-      const randomCount = 3;
-      const randomIndexes = [];
-
-      while (randomIndexes.length < randomCount) {
-        const randomIndex = Math.floor(Math.random() * follower.posts.length);
-        if (!randomIndexes.includes(randomIndex)) {
-          randomIndexes.push(randomIndex);
-          randomFollowerPosts.push(follower.posts[randomIndex]);
-        }
-      }
-    });
-
-    const randomPosts = await Post.aggregate([{ $sample: { size: 5 } }]);
-
-    const Posts = [
-      ...userPosts,
-      ...allFriendPosts,
-      ...randomFollowerPosts,
-      ...randomPosts,
-    ];
-
-    res.status(200).json(Posts);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    throw Object.assign(new Error("User not found"), { status: 404 });
   }
+
+  // Fetch the user's posts
+  const userPosts = await Post.find({ user: user._id });
+
+  const friendPosts = await Promise.all(
+    user.followings.map(async (friendId) => {
+      const friendPosts = await Post.find({ user: friendId });
+      return friendPosts;
+    })
+  );
+
+  const allFriendPosts = friendPosts.flat();
+
+  const followers = await User.find({ _id: { $in: user.followers } });
+  const randomFollowerPosts = [];
+
+  followers.forEach((follower) => {
+    const randomCount = 3;
+    const randomIndexes = [];
+
+    while (randomIndexes.length < randomCount) {
+      const randomIndex = Math.floor(Math.random() * follower.posts.length);
+      if (!randomIndexes.includes(randomIndex)) {
+        randomIndexes.push(randomIndex);
+        randomFollowerPosts.push(follower.posts[randomIndex]);
+      }
+    }
+  });
+
+  const randomPosts = await Post.aggregate([{ $sample: { size: 5 } }]);
+
+  const Posts = [
+    ...userPosts,
+    ...allFriendPosts,
+    ...randomFollowerPosts,
+    ...randomPosts,
+  ];
+
+  res.status(200).json(Posts);
 });
 
 exports.getAllPosts = asyncHandler(async (req, res) => {
-  // try {
   const allPosts = await Post.find();
   if (!allPosts) {
-    return res.status(404).json({ message: "something is wrong" });
+    throw Object.assign(new Error("something is wrong"), { status: 404 });
   }
   const randomPosts = await Post.aggregate([{ $sample: { size: 10 } }]);
-  console.log(randomPosts);
+  // console.log(randomPosts);
 
   const combinedPosts = [...allPosts, ...randomPosts];
 
   res.status(200).json(combinedPosts);
-  // } catch (err) {
-  //   console.error(err);
-  //   res.status(500).json({ message: "Internal server error" });
-  // }
 });
