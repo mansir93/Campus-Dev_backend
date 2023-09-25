@@ -3,6 +3,7 @@ const router = require("express").Router();
 const { isAuthenticated } = require("../middleware/auth");
 
 const {
+  userProfile,
   updateUser,
   deleteUser,
   getSingleUser,
@@ -20,6 +21,19 @@ const {
  *   name: user
  *   description: User management
  */
+/**
+ * @swagger
+ * /user/profile:
+ *   get:
+ *     summary: Get user profile
+ *     tags: [user]
+ *     responses:
+ *       '200':
+ *         description: Successfully user
+ *       '500':
+ *         description: Internal server error
+ */
+router.get("/profile", isAuthenticated, userProfile);
 
 /**
  * @swagger

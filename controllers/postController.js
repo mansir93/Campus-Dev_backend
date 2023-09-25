@@ -29,6 +29,7 @@ exports.createPost = asyncHandler(async (req, res) => {
         {
           transformation,
           resource_type: "auto",
+          folder:"userPostImages"
         }
       );
       uploadedImages.push(result.secure_url);

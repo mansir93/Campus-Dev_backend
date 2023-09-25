@@ -2,6 +2,20 @@ const cloudinary = require("cloudinary").v2;
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 
+// gett user profile
+exports.userProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id)
+  if (!user) {
+    throw Object.assign(new Error("User not found"), { status: 404 });
+  }
+  const { password, updatedAt, ...other } = user._doc;
+  res.status(200).json(other);
+
+
+});
+
+
+
 // updateUser
 exports.updateUser = asyncHandler(async (req, res) => {
   if (req.user.id === req.params.id) {
