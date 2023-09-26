@@ -6,6 +6,8 @@ const base64url = require("base64url");
 
 const sharp = require("sharp"); // Add sharp for image optimization
 
+
+
 // createpost
 exports.createPost = asyncHandler(async (req, res) => {
   const { title } = req.body;
@@ -29,7 +31,7 @@ exports.createPost = asyncHandler(async (req, res) => {
         {
           transformation,
           resource_type: "auto",
-          folder:"userPostImages"
+          folder: "userPostImages",
         }
       );
       uploadedImages.push(result.secure_url);
@@ -96,99 +98,105 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 
 //Like a post
 exports.likePost = asyncHandler(async (req, res) => {
-    3;
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      throw Object.assign(new Error("Post not found"), { status: 404 });
-    }
-    const userId = req.user.id;
+  3;
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  const userId = req.user.id;
 
-    if (!post.like.includes(userId)) {
-      if (post.dislike.includes(userId)) {
-        await post.updateOne({ $pull: { dislike: userId } });
-      }
-      await post.updateOne({ $push: { like: userId } });
-      return res.status(200).json("Post has been liked");
-    } else {
-      await post.updateOne({ $pull: { like: userId } });
-      return res.status(200).json("Post has been unlike");
+  if (!post.like.includes(userId)) {
+    if (post.dislike.includes(userId)) {
+      await post.updateOne({ $pull: { dislike: userId } });
     }
-
+    await post.updateOne({ $push: { like: userId } });
+    return res.status(200).json("Post has been liked");
+  } else {
+    await post.updateOne({ $pull: { like: userId } });
+    return res.status(200).json("Post has been unlike");
+  }
 });
 
 //disLike a post
 exports.dislikePost = asyncHandler(async (req, res) => {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      throw Object.assign(new Error("Post not found"), { status: 404 });
-    }
-    const userId = req.user.id;
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  const userId = req.user.id;
 
-    if (!post.dislike.includes(userId)) {
-      if (post.like.includes(userId)) {
-        await post.updateOne({ $pull: { like: userId } });
-      }
-      await post.updateOne({ $push: { dislike: userId } });
-      return res.status(200).json("Post has been disliked");
-    } else {
-      await post.updateOne({ $pull: { dislike: userId } });
-      return res.status(200).json("Post has been unlike");
+  if (!post.dislike.includes(userId)) {
+    if (post.like.includes(userId)) {
+      await post.updateOne({ $pull: { like: userId } });
     }
-
+    await post.updateOne({ $push: { dislike: userId } });
+    return res.status(200).json("Post has been disliked");
+  } else {
+    await post.updateOne({ $pull: { dislike: userId } });
+    return res.status(200).json("Post has been unlike");
+  }
 });
 
 exports.commentPost = asyncHandler(async (req, res) => {
-    const { comment, profile } = req.body;
+  const { comment, profile } = req.body;
 
-    const newComment = {
-      user: req.user.id,
-      username: req.user.username,
-      comment,
-      profile,
-    };
-    const post = await Post.findById(req.params.id);
+  const newComment = {
+    user: req.user.id,
+    username: req.user.username,
+    comment,
+    profile,
+  };
+  const post = await Post.findById(req.params.id);
 
-    // console.log(post);
+  // console.log(post);
 
-    if (!post) {
-      throw Object.assign(new Error("Post not found"), { status: 404 });
-    }
-    post.comments.push(newComment);
-    await post.save();
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  post.comments.push(newComment);
+  await post.save();
 
-    res.status(200).json(post);
+  res.status(200).json(post);
 });
 
 exports.deleteComment = asyncHandler(async (req, res) => {
-    const { postid, commentid } = req.params;
-    const post = await Post.findById(postid);
+  const { postid, commentid } = req.params;
+  const post = await Post.findById(postid);
 
-    if (!post) {
-      throw Object.assign(new Error("Post not found"), { status: 404 });
-    }
-    const commentIndex = post.comments.findIndex(
-      (comment) => comment._id.toString() === commentid
-    );
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  const commentIndex = post.comments.findIndex(
+    (comment) => comment._id.toString() === commentid
+  );
 
-    if (commentIndex === -1) {
-      throw Object.assign(new Error("comment not found"), { status: 404 });
-    }
-    if (post.comments[commentIndex].user.toString() !== req.user.id) {
-      throw Object.assign(new Error("Unauthorized"), { status: 403 });
-    }
-    post.comments.splice(commentIndex, 1);
+  if (commentIndex === -1) {
+    throw Object.assign(new Error("comment not found"), { status: 404 });
+  }
+  if (post.comments[commentIndex].user.toString() !== req.user.id) {
+    throw Object.assign(new Error("Unauthorized"), { status: 403 });
+  }
+  post.comments.splice(commentIndex, 1);
 
-    await post.save();
+  await post.save();
 
-    res.status(200).json(post);
-
+  res.status(200).json(post);
 });
 
 // get endpoints
-
+const userProjection = {
+  password: 0,
+  updatedAt: 0,
+  isAdmin: 0,
+};
 //get a post
 exports.getSinglePost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id)
+    .populate({
+      path: "user",
+      select: userProjection,
+    })
+    .populate("comments.user");
   if (!post) {
     throw Object.assign(new Error("Post not found"), { status: 404 });
   }
@@ -200,11 +208,22 @@ exports.getTimelinePost = asyncHandler(async (req, res) => {
   if (!user) {
     throw Object.assign(new Error("User not found"), { status: 404 });
   }
-  const userPosts = await Post.find({ user: user._id });
+  const userPosts = await Post.find({ user: user._id })
+    .populate({
+      path: "user",
+      select: userProjection,
+    })
+    .populate("comments.user");
+  F;
 
   const friendPosts = await Promise.all(
     user.followings.map(async (friendId) => {
-      const friendPosts = await Post.find({ user: friendId });
+      const friendPosts = await Post.find({ user: friendId })
+        .populate({
+          path: "user",
+          select: userProjection,
+        })
+        .populate("comments.user");
       return friendPosts;
     })
   );
@@ -221,11 +240,21 @@ exports.getPostsBaseUser = asyncHandler(async (req, res) => {
   }
 
   // Fetch the user's posts
-  const userPosts = await Post.find({ user: user._id });
+  const userPosts = await Post.find({ user: user._id })
+    .populate({
+      path: "user",
+      select: userProjection,
+    })
+    .populate("comments.user");
 
   const friendPosts = await Promise.all(
     user.followings.map(async (friendId) => {
-      const friendPosts = await Post.find({ user: friendId });
+      const friendPosts = await Post.find({ user: friendId })
+        .populate({
+          path: "user",
+          select: userProjection,
+        })
+        .populate("comments.user");
       return friendPosts;
     })
   );
@@ -249,26 +278,43 @@ exports.getPostsBaseUser = asyncHandler(async (req, res) => {
   });
 
   const randomPosts = await Post.aggregate([{ $sample: { size: 5 } }]);
+  // .populate({
+  //   path: "user",
+  //   select: userProjection,
+  // })
+  // .populate("comments.user");
 
   const Posts = [
     ...userPosts,
     ...allFriendPosts,
     ...randomFollowerPosts,
-    ...randomPosts,
+    // ...randomPosts,
   ];
 
   res.status(200).json(Posts);
 });
 
 exports.getAllPosts = asyncHandler(async (req, res) => {
-  const allPosts = await Post.find();
+  const allPosts = await Post.find()
+    .populate({
+      path: "user",
+      select: userProjection,
+    })
+    .populate("comments.user");
   if (!allPosts) {
     throw Object.assign(new Error("something is wrong"), { status: 404 });
   }
   const randomPosts = await Post.aggregate([{ $sample: { size: 10 } }]);
+  // .populate({
+  //   path: "user",
+  //   select: userProjection,
+  // })
+  // .populate("comments.user");
   // console.log(randomPosts);
 
-  const combinedPosts = [...allPosts, ...randomPosts];
+  const combinedPosts = [...allPosts, 
+    // ...randomPosts
+  ];
 
   res.status(200).json(combinedPosts);
 });
