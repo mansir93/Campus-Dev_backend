@@ -6,8 +6,6 @@ const base64url = require("base64url");
 
 const sharp = require("sharp"); // Add sharp for image optimization
 
-
-
 // createpost
 exports.createPost = asyncHandler(async (req, res) => {
   const { title } = req.body;
@@ -21,7 +19,7 @@ exports.createPost = asyncHandler(async (req, res) => {
 
   for (const file of files) {
     const transformation = [
-      { width: 800, height: 600, crop: "fill" },
+      // { width: 800, height: 600, crop: "fill" },
       { quality: "auto" },
     ];
     const base64Data = file.buffer.toString("base64");
@@ -34,21 +32,26 @@ exports.createPost = asyncHandler(async (req, res) => {
           folder: "userPostImages",
         }
       );
-      uploadedImages.push(result.secure_url);
+      // console.log(result);
+      uploadedImages.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+        asset_id: result.asset_id,
+      });
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  console.log("upload image", uploadedImages);
+  // console.log("upload image", uploadedImages);
   const newpost = await Post.create({
     user: req.user.id,
     title,
     media: uploadedImages,
   });
   if (newpost) {
-    console.log(newpost);
+    // console.log(newpost);
     res.status(201).json({
       success: true,
       newpost,
@@ -312,7 +315,8 @@ exports.getAllPosts = asyncHandler(async (req, res) => {
   // .populate("comments.user");
   // console.log(randomPosts);
 
-  const combinedPosts = [...allPosts, 
+  const combinedPosts = [
+    ...allPosts,
     // ...randomPosts
   ];
 
