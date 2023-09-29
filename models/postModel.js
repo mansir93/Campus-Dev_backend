@@ -77,13 +77,13 @@ const PostSchema = new mongoose.Schema(
           ref:'User' ,
           required: true,
         },
-        username: {
-          type: String,
-          required: true,
-        },
-        profile: {
-          type: String,
-        },
+        // username: {
+        //   type: String,
+        //   required: true,
+        // },
+        // profile: {
+        //   type: String,
+        // },
         comment: {
           type: String,
           required: true,

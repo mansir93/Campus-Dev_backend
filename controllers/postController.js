@@ -141,13 +141,14 @@ exports.dislikePost = asyncHandler(async (req, res) => {
 });
 
 exports.commentPost = asyncHandler(async (req, res) => {
-  const { comment, profile } = req.body;
+  const { comment } = req.body;
+  if (!comment) {
+    throw Object.assign(new Error("type comment message"), { status: 403 });
+  }
 
   const newComment = {
     user: req.user.id,
-    username: req.user.username,
     comment,
-    profile,
   };
   const post = await Post.findById(req.params.id);
 
