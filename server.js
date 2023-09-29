@@ -19,6 +19,13 @@ const PORT = process.env.PORT || 5001;
 const app = express();
 connectDB();
 
+// app.use(
+//   bodyParser.json({
+//     reviver: (key, value) => {
+//       return value;
+//     },
+//   })
+// );
 app.use(
   session({
     secret: process.env.TOKEN_SECRET,
@@ -37,7 +44,14 @@ app.use(cors(corsOptions));
 
 // middleware
 
-app.use(express.json());
+app.use(
+  express.json({
+    reviver: (key, value) => {
+      return value;
+    },
+  })
+);
+// app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
@@ -47,10 +61,8 @@ app.use("/user/", userRoutes);
 app.use("/post/", postRoutes);
 app.use("/", swaggerUiServe, swaggerUiSetup);
 app.use((req, res, next) => {
-  res.status(404).json({ message: 'Route not found. Please check the URL.' });
+  res.status(404).json({ message: "Route not found. Please check the URL." });
 });
-
-
 
 app.use(ErrorHandler);
 app.listen(PORT, () => {
