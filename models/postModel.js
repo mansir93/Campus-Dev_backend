@@ -49,7 +49,7 @@ const PostSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     title: {
@@ -74,16 +74,9 @@ const PostSchema = new mongoose.Schema(
       {
         user: {
           type: mongoose.Schema.Types.ObjectId,
-          ref:'User' ,
+          ref: "User",
           required: true,
         },
-        // username: {
-        //   type: String,
-        //   required: true,
-        // },
-        // profile: {
-        //   type: String,
-        // },
         comment: {
           type: String,
           required: true,

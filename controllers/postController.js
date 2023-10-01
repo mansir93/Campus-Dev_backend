@@ -101,7 +101,6 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
 
 //Like a post
 exports.likePost = asyncHandler(async (req, res) => {
-  3;
   const post = await Post.findById(req.params.id);
   if (!post) {
     throw Object.assign(new Error("Post not found"), { status: 404 });
@@ -115,6 +114,18 @@ exports.likePost = asyncHandler(async (req, res) => {
     await post.updateOne({ $push: { like: userId } });
     return res.status(200).json("Post has been liked");
   } else {
+    await post.updateOne({ $pull: { like: userId } });
+    return res.status(200).json("Post has been unlike");
+  }
+});
+//unLike a post
+exports.unlikePost = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw Object.assign(new Error("Post not found"), { status: 404 });
+  }
+  const userId = req.user.id;
+  if (post.like.includes(userId)) {
     await post.updateOne({ $pull: { like: userId } });
     return res.status(200).json("Post has been unlike");
   }

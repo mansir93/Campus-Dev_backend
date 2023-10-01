@@ -6,6 +6,7 @@ const {
   updatePost,
   deletePost,
   likePost,
+  unlikePost,
   dislikePost,
   commentPost,
   deleteComment,
@@ -189,6 +190,32 @@ router.delete("/:id", isAuthenticated, deletePost);
  *         description: Internal server error
  */
 router.put("/:id/like", isAuthenticated, likePost);
+/**
+ * @swagger
+ * /post/{id}/unlike:
+ *   put:
+ *     summary: unlike a user post
+ *     tags: [post]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the post to unlike
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Post unliked successfully
+ *       '401':
+ *         description: Unauthorized - user is not authenticated
+ *       '404':
+ *         description: Post not found
+ *       '500':
+ *         description: Internal server error
+ */
+router.put("/:id/unlike", isAuthenticated, unlikePost);
 
 /**
  * @swagger
