@@ -44,14 +44,7 @@ app.use(cors(corsOptions));
 
 // middleware
 
-app.use(
-  express.json({
-    reviver: (key, value) => {
-      return value;
-    },
-  })
-);
-// app.use(express.json());
+app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 
