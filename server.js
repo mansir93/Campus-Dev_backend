@@ -19,13 +19,6 @@ const PORT = process.env.PORT || 5001;
 const app = express();
 connectDB();
 
-// app.use(
-//   bodyParser.json({
-//     reviver: (key, value) => {
-//       return value;
-//     },
-//   })
-// );
 app.use(
   session({
     secret: process.env.TOKEN_SECRET,
